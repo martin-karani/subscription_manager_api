@@ -76,7 +76,7 @@ The ORM is still used for most Create, Update, Delete (CUD) operations and simpl
     -   `idx_user_sub_user_id_start_date` on `user_subscriptions (user_id, start_date)`: This composite index is vital for efficiently filtering by `user_id` and then ordering by `start_date` for pagination.
     -   The count query also benefits from an index on `user_subscriptions (user_id)`.
 
-## 3. General Indexing Strategy
+## 3. General Indexing 
 
 Beyond the specific queries above, the following indexes are defined in `app/models.py` to support various operations:
 
@@ -90,18 +90,3 @@ Beyond the specific queries above, the following indexes are defined in `app/mod
     -   `idx_user_sub_end_date_status (end_date, status)`: Useful for background jobs that might need to process subscriptions based on their end date and status (e.g., expiring subscriptions).
     -   `idx_user_sub_plan_id_status (plan_id, status)`: Useful for queries related to a specific plan, such as finding all active subscriptions for a plan before attempting to delete or modify it.
 
-## 4. Analyzing Slow Queries
-
-In a production environment, slow query analysis would involve:
-
-1.  **Database Monitoring Tools:** Using tools provided by MySQL (like the slow query log, `PERFORMANCE_SCHEMA`) or third-party monitoring solutions (e.g., Percona Monitoring and Management, Datadog, New Relic) to identify queries exceeding a certain time threshold.
-2.  **`EXPLAIN` Command:** For any identified slow queries, running `EXPLAIN SELECT ...` (or `EXPLAIN ANALYZE` in newer MySQL/compatible versions) to understand the query execution plan. This shows:
-    -   How tables are joined.
-    -   Which indexes are being used (or not used).
-    -   The number of rows scanned.
-    -   Whether temporary tables or filesorts are involved.
-3.  **Optimization Based on `EXPLAIN`:**
-    -   If indexes are not used, create appropriate ones.
-    -   If the wrong index is chosen, try to rewrite the query or use index hints (use with caution).
-    -   If joins are inefficient, re-evaluate join conditions or table structures.
-    -   If large sorts or temporary tables occur, consider if queries can be restructured or if indexes can pre-sort data.
